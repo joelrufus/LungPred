@@ -1,0 +1,11 @@
+curl -X POST \
+"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyAtgr04Su9dJVzUGiBav9RSdV3cFZmzs0c" \
+-H "Content-Type: application/json" \
+-d '{
+  "contents": [{
+    "parts": [{"text": "Hello, how does AI work?"}]
+  }]
+}'
+
+AIzaSyAtgr04Su9dJVzUGiBav9RSdV3cFZmzs0c
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"

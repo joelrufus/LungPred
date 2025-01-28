@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lung Disease Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/" class="logo">LungPredict by Rufus</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </nav>
+    
+
+
+
+    <div class="main-container">
+        <!-- Prediction Section -->
+        <div class="container">
+            <h1>Lung Disease Prediction</h1>
+            <p class="tagline">Upload an image to detect possible lung diseases using AI.</p>
+    
+            <form action="/predict" method="POST" enctype="multipart/form-data" id="upload-form">
+                <label for="file-upload" class="custom-file-upload">
+                    <i class="fas fa-upload"></i> Choose an Image
+                </label>
+                <input type="file" id="file-upload" name="image" accept="image/*" required onchange="previewImage(event)">
+                <button type="submit">Predict</button>
+            </form>
+    
+            <div class="result">
+                <div class="image-container">
+                    <img id="image-preview" src="#" alt="Image Preview" style="display: none;">
+                </div>
+                <div class="label-container"></div>
+            </div>
+        </div>
+    
+        <!-- Chatbot Section -->
+        <div class="chat-container">
+            <h2>Ask the AI Chatbot</h2>
+            <div id="chat-box">
+                <!-- Chat messages will appear here -->
+            </div>
+            <form id="chat-form">
+                <input type="text" id="user-input" placeholder="Ask about lung diseases..." required class="chat-input">
+                <button type="submit" class="chat-submit">Send</button>
+            </form>
+        </div>
+    </div>
+    
+
+    <!-- JavaScript -->
+    <script>
+        // Prediction logic
+        document.getElementById('upload-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const fileInput = document.getElementById('file-upload');
+            const preview = document.getElementById('image-preview');
+            const formData = new FormData(this);
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    preview.src = reader.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('.label-container').innerHTML = `
+                        <p class="prediction-label">Prediction: <span class="prediction-result">${data.prediction}</span></p>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        // Chatbot logic
+        // Chatbot logic
+document.getElementById('chat-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const userInput = document.getElementById('user-input').value;
+    const chatBox = document.getElementById('chat-box');
+
+    // Display user's message
+    chatBox.innerHTML += `<div class="user-message">${userInput}</div>`;
+    document.getElementById('user-input').value = '';
+
+    // Scroll to the latest message
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userInput }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const botMessage = data.response || "Sorry, I couldn't understand that.";
+
+            // Display the chatbot's response
+            chatBox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
+
+            // Scroll to the latest message
+            chatBox.scrollTop = chatBox.scrollHeight;
+        } else {
+            chatBox.innerHTML += `<div class="bot-message error">Error communicating with the chatbot.</div>`;
+
+            // Scroll to the latest message
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    } catch (error) {
+        chatBox.innerHTML += `<div class="bot-message error">Unexpected error occurred.</div>`;
+        console.error('Chatbot error:', error);
+
+        // Scroll to the latest message
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+});
+
+
+    </script>
+</body>
+</html>
